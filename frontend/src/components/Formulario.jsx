@@ -20,14 +20,14 @@ function Formulario({ onAgregar }) {
             nombre: form.nombre,
             categoriaId: form.categoriaId,
             estado: form.estado,
-            puntuacion: form.puntuacion,
+            puntuacion: Number(form.puntuacion),
             notas: form.notas,
             fechaRegistro: new Date().toISOString(),
             fechaActividad: new Date().toISOString(),
             activo: true,
 
             atributos: {
-                numeroEstampa: form.numeroEstampa,
+                numeroEstampa: Number(form.numeroEstampa),
                 seleccion: form.seleccion,
                 jugador: form.jugador,
                 pegada: form.pegada,
@@ -68,6 +68,8 @@ function Formulario({ onAgregar }) {
             <h2>Nueva Estampa</h2>
             <input name="nombre" value={form.nombre} onChange={percibirCambio} placeholder="Nombre" />
             
+            <input name="numeroEstampa" type="number" value={form.numeroEstampa} onChange={percibirCambio} />
+
             <select name="categoriaId" value={form.categoriaId} onChange={percibirCambio}>
             <option value="">-- Categoría --</option>
             <option value="regular">Regular</option>
