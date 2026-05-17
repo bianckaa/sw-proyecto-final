@@ -13,7 +13,33 @@ function App() {
   }, [items])
 
   const agregarItem = (nuevoItem) => { 
-    const listaActualizada = [...items, nuevoItem]     // Copia todos los items existentes y agrega nuevo al final 
+    // Copia todos los items existentes y agrega nuevo al final 
+    const listaActualizada = [...items, nuevoItem]   // ... copia todo el contenido de aqui
+    setItems(listaActualizada)
+  }
+
+  const eliminarItem = (id) => { 
+    const listaActualizada = items.map((item) => {     /* .map() recorre todos los items*/
+      // si el id coincide
+      if (item.id == id) {
+        return {...item, 
+                activo: false
+              }
+      } else { // si no coincide
+        return item
+      }
+    })
+    setItems(listaActualizada)
+  }
+
+  const editarItem = (id, datosActualizados) => { 
+    const listaActualizada = items.map((item) => {    
+      if (item.id == id) {
+        return {...item, ...datosActualizados} // copia el item y sobreescribe con nuevos datos
+      } else { 
+        return item
+      }
+    })
     setItems(listaActualizada)
   }
 
@@ -23,6 +49,11 @@ function App() {
 
       <Formulario onAgregar={agregarItem}/> {/*Como es componente sin contenido adentro, se puede cerrar en una sola línea*/}
 
+      <Coleccion 
+        items={items} 
+        onEditar={editarItem}
+        onEliminar={eliminarItem}
+      />
     </div>
   )
 }
