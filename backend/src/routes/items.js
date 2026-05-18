@@ -6,7 +6,12 @@ const { randomUUID } = require('crypto')
 // GET /api/items (devuelve todos los activos)
 router.get('/', (req, res) => {
   const items = db.prepare('SELECT * FROM items WHERE activo = 1').all()
-  res.json(items)
+  const itemsFormateados = items.map((item) => ({
+    ...item,
+    atributos: JSON.parse(item.atributos),
+    activo: item.activo === 1
+  }))
+  res.json(itemsFormateados)
 })
 
 // POST /api/items (crea un item nuevo)
