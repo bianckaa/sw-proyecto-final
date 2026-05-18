@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useEffect } from 'react'
 import './App.css'
 import Formulario from './components/Formulario'
+import Coleccion from './components/Coleccion'
 
 function App() {
   const [items, setItems] = useState(
