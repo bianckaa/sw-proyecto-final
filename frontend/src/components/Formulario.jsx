@@ -91,7 +91,14 @@ function Formulario({ onAgregar }) {
             <input name="puntuacion" type="number" min="0" max="10" value={form.puntuacion} onChange={percibirCambio} />
 
             <input name="notas" value={form.notas} onChange={percibirCambio} placeholder="Notas"></input>
-
+            <label>
+                <input 
+                    type="checkbox" 
+                    name="pegada" 
+                    checked={form.pegada} 
+                    onChange={percibirCambio} 
+                />Pegada en el álbum
+            </label>
             <button className="btn-guardar" onClick={manejarClick}>Guardar</button>
         </div>
     )
