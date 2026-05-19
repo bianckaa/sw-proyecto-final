@@ -40,6 +40,4 @@ El servidor corre en http://localhost:3000.
 ## Mis primeros Items
 A continuación se muestran las primeras estampas reales registradas en la aplicación:
 
-![Estampa 1](./assets/img/captura_estampa1.png)
-![Estampa 2](./assets/img/captura_estampa2.png)
-![Estampa 3](./assets/img/captura_estampa3.png)
+![Estampas](./assets/img/captura_items.png)
