@@ -64,7 +64,7 @@ function Formulario({ onAgregar }) {
     }
 
     return (
-        <div>
+        <div className="formulario">
             <h2>Nueva Estampa</h2>
             <input name="nombre" value={form.nombre} onChange={percibirCambio} placeholder="Nombre" />
             
@@ -92,7 +92,7 @@ function Formulario({ onAgregar }) {
 
             <input name="notas" value={form.notas} onChange={percibirCambio} placeholder="Notas"></input>
 
-            <button onClick={manejarClick}>Guardar</button>
+            <button className="btn-guardar" onClick={manejarClick}>Guardar</button>
         </div>
     )
 }

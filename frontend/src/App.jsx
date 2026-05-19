@@ -46,7 +46,7 @@ function App() {
 
   return(
     <div>
-      <h1>Estampas del Mundial 2026</h1>
+      <h1>Albúm Copa Mundial de Fútbol 2026</h1>
 
       <Formulario onAgregar={agregarItem}/> {/*Como es componente sin contenido adentro, se puede cerrar en una sola línea*/}
 

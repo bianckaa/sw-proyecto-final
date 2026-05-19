@@ -18,7 +18,7 @@ function Card({ item, onEditar, onEliminar }) {
     })
     
     return (
-        <div>
+        <div className="card">
             {editando ? (
                 <>
                     <input 
@@ -61,18 +61,18 @@ function Card({ item, onEditar, onEliminar }) {
                 </>
             ) : (
                 <> {/* Fragment: contenedor invisible para no usar div*/}
-                    <p>{item.atributos.numeroEstampa}</p>
-                    <p>{item.atributos.jugador}</p>
-                    <p>{item.atributos.seleccion}</p>
-                    <p>{item.atributos.repetidas}</p>
+                    <p className="numero">#{item.atributos.numeroEstampa}</p>
+                    <p className="jugador">{item.atributos.jugador}</p>
+                    <p className="seleccion">{item.atributos.seleccion}</p>
+                    <p>Repetidas: {item.atributos.repetidas}</p>
 
-                    <p>{item.categoriaId}</p>
-                    <p>{item.puntuacion}</p>
-                    <p>{item.notas}</p>
+                    <p>Categoría: {item.categoriaId}</p>
+                    <p>Puntuación: {item.puntuacion}/10</p>
+                    <p>Notas: {item.notas}</p>
 
                     {/* ()=> se ejecuta solo cuando usuario hace clic */}
-                    <button onClick={() => onEliminar(item.id)}>Eliminar</button>
-                    <button onClick={() => setEditando(true)}>Editar</button>
+                    <button className="btn-eliminar" onClick={() => onEliminar(item.id)}>Eliminar</button>
+                    <button className="btn-editar" onClick={() => setEditando(true)}>Editar</button>
                 </>
             )}
         </div>

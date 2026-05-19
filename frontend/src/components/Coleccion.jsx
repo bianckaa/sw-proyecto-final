@@ -4,7 +4,7 @@ function Coleccion({ items, onEditar, onEliminar }) {
     const itemsActivos = items.filter((item) => item.activo === true)
 
     return (
-    <div>
+    <div className="coleccion">
         {itemsActivos.map((item) => (
         <Card 
             key={item.id}
