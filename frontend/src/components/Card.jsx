@@ -1,6 +1,12 @@
-import { useState } from 'react'
+import { useState, forwardRef } from 'react'
+import { useStorage } from '../context/StorageProvider'
+import { CATEGORIAS } from '../utils/categorias'
 
-function Card({ item, onEditar, onEliminar }) {
+// forwardRef permite que Coleccion apunte una ref al div raíz del último Card
+const Card = forwardRef(function Card({ item, onCambio }, ref) {
+    const { guardarItem, eliminarItem } = useStorage()
+    const categoria = CATEGORIAS.find((cat) => cat.id === item.categoriaId)
+    const colorCategoria = categoria?.color || 'var(--color-text-muted)'
     const [editando, setEditando] = useState(false)
     const [formEdicion, setFormEdicion] = useState({
         nombre: item.nombre,
@@ -18,7 +24,7 @@ function Card({ item, onEditar, onEliminar }) {
     })
     
     return (
-        <div className="card">
+        <div className="card" ref={ref} style={{ borderLeft: `4px solid ${colorCategoria}` }}>
             {editando ? (
                 <>
                     <input 
@@ -53,9 +59,10 @@ function Card({ item, onEditar, onEliminar }) {
                         onChange={(e) => setFormEdicion({...formEdicion, notas: e.target.value})}
                     />    
 
-                    <button onClick={() => {
-                        onEditar(item.id, formEdicion)
+                    <button onClick={async () => {
+                        await guardarItem({ ...item, ...formEdicion })
                         setEditando(false)
+                        if (onCambio) onCambio()
                     }}>Guardar</button>
                     <button onClick={() => setEditando(false)}>Cancelar</button>
                 </>
@@ -66,17 +73,28 @@ function Card({ item, onEditar, onEliminar }) {
                     <p className="seleccion">{item.atributos.seleccion}</p>
                     <p>Repetidas: {item.atributos.repetidas}</p>
 
-                    <p>Categoría: {item.categoriaId}</p>
+                    <p>
+                        Categoría:{' '}
+                        <span
+                            className="badge-categoria"
+                            style={{ backgroundColor: colorCategoria }}
+                        >
+                            {categoria ? `${categoria.emoji} ${categoria.nombre}` : item.categoriaId}
+                        </span>
+                    </p>
                     <p>Puntuación: {item.puntuacion}/10</p>
                     <p>Notas: {item.notas}</p>
 
                     {/* ()=> se ejecuta solo cuando usuario hace clic */}
-                    <button className="btn-eliminar" onClick={() => onEliminar(item.id)}>Eliminar</button>
+                    <button className="btn-eliminar" onClick={async () => {
+                        await eliminarItem(item.id)
+                        if (onCambio) onCambio()
+                    }}>Eliminar</button>
                     <button className="btn-editar" onClick={() => setEditando(true)}>Editar</button>
                 </>
             )}
         </div>
     )
-}
+})
 
 export default Card
