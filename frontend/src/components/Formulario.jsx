@@ -1,6 +1,12 @@
-import { useState } from 'react'
+import { useState, forwardRef } from 'react'
+import { useStorage } from '../context/StorageProvider'
+import { CATEGORIAS } from '../utils/categorias'
 
-function Formulario({ onAgregar }) {
+// useRef — la ref del input "nombre" llega desde App por forwardRef; se usa
+// para devolver el foco tras guardar (Uso 1) y para el atajo Ctrl+N.
+const Formulario = forwardRef(function Formulario({ onGuardado }, inputRef) {
+    const { guardarItem } = useStorage()
+
     const [form, setForm] = useState({
         /* Valor vacío con el que empieza cada campo */
         nombre: '',
@@ -14,7 +20,7 @@ function Formulario({ onAgregar }) {
         pegada: false
     })
 
-    const manejarClick = () => {
+    const manejarClick = async () => {
         const nuevoItem = {
             id: crypto.randomUUID(),
             nombre: form.nombre,
@@ -35,8 +41,9 @@ function Formulario({ onAgregar }) {
             }
         }
 
-        onAgregar(nuevoItem)
-        
+        await guardarItem(nuevoItem)
+        if (onGuardado) onGuardado()
+
         setForm({
             nombre: '',
             categoriaId: '',
@@ -48,6 +55,9 @@ function Formulario({ onAgregar }) {
             jugador: '',
             pegada: false
         })
+
+        // Tras guardar con éxito, el cursor regresa al campo nombre
+        inputRef?.current?.focus()
     }
 
     const percibirCambio = (e) => {
@@ -66,16 +76,17 @@ function Formulario({ onAgregar }) {
     return (
         <div className="formulario">
             <h2>Nueva Estampa</h2>
-            <input name="nombre" value={form.nombre} onChange={percibirCambio} placeholder="Nombre" />
+            <input ref={inputRef} name="nombre" value={form.nombre} onChange={percibirCambio} placeholder="Nombre" />
             
             <input name="numeroEstampa" type="number" value={form.numeroEstampa} onChange={percibirCambio} />
 
             <select name="categoriaId" value={form.categoriaId} onChange={percibirCambio}>
             <option value="">-- Categoría --</option>
-            <option value="regular">Regular</option>
-            <option value="holografica">Holográfica</option>
-            <option value="dorada">Dorada</option>
-            <option value="extra">Extra</option>
+            {CATEGORIAS.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                    {cat.emoji} {cat.nombre}
+                </option>
+            ))}
             </select>
 
             <input name="seleccion" value={form.seleccion} onChange={percibirCambio} placeholder="Selección (ej: Argentina)" />
@@ -102,6 +113,6 @@ function Formulario({ onAgregar }) {
             <button className="btn-guardar" onClick={manejarClick}>Guardar</button>
         </div>
     )
-}
+})
 
 export default Formulario
