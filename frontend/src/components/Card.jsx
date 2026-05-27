@@ -1,14 +1,11 @@
-import { useState, forwardRef } from 'react'
+import { memo, useState, forwardRef } from 'react'
 import { useStorage } from '../context/StorageProvider'
 import { CATEGORIAS } from '../utils/categorias'
 
-// forwardRef permite que Coleccion apunte una ref al div raíz del último Card
-const Card = forwardRef(function Card({ item, onCambio }, ref) {
+const Card = forwardRef(function Card({ item, onCambio, onEliminar, onCambiarEstado }, ref) {
     const { guardarItem, eliminarItem } = useStorage()
     const categoria = CATEGORIAS.find((cat) => cat.id === item.categoriaId)
     const colorCategoria = categoria?.color || 'var(--color-text-muted)'
-    // Fondo del mismo color de la categoría pero con baja opacidad (1A ≈ 10%).
-    // Solo se aplica si hay un hex real; si no, se usa la superficie por defecto.
     const fondoCategoria = categoria ? `${categoria.color}1A` : 'var(--color-surface)'
     const [editando, setEditando] = useState(false)
     const [formEdicion, setFormEdicion] = useState({
@@ -25,7 +22,20 @@ const Card = forwardRef(function Card({ item, onCambio }, ref) {
             repetidas: item.atributos.repetidas
         }
     })
-    
+
+    const handleClickEliminar = async () => {
+        if (onEliminar) {
+            await onEliminar(item.id)
+        } else {
+            await eliminarItem(item.id)
+            if (onCambio) onCambio()
+        }
+    }
+
+    const handleClickEstado = () => {
+        if (onCambiarEstado) onCambiarEstado(item.id)
+    }
+
     return (
         <div
             className="card"
@@ -37,37 +47,37 @@ const Card = forwardRef(function Card({ item, onCambio }, ref) {
         >
             {editando ? (
                 <>
-                    <input 
-                        value={formEdicion.atributos.numeroEstampa} 
+                    <input
+                        value={formEdicion.atributos.numeroEstampa}
                         onChange={(e) => setFormEdicion({...formEdicion.atributos, numeroEstampa: e.target.value})}
                     />
-                    <input 
-                        value={formEdicion.atributos.jugador} 
+                    <input
+                        value={formEdicion.atributos.jugador}
                         onChange={(e) => setFormEdicion({...formEdicion.atributos, jugador: e.target.value})}
                     />
-                    <input 
+                    <input
                         value={formEdicion.atributos.seleccion}
                         onChange={(e) => setFormEdicion({
-                        ...formEdicion, 
+                        ...formEdicion,
                         atributos: {...formEdicion.atributos, seleccion: e.target.value}
                         })}
                     />
-                    <input 
-                        value={formEdicion.atributos.repetidas} 
+                    <input
+                        value={formEdicion.atributos.repetidas}
                         onChange={(e) => setFormEdicion({...formEdicion.atributos, repetidas: e.target.value})}
                     />
-                    <input 
-                        value={formEdicion.categoriaId} 
+                    <input
+                        value={formEdicion.categoriaId}
                         onChange={(e) => setFormEdicion({...formEdicion, categoriaId: e.target.value})}
                     />
-                    <input 
-                        value={formEdicion.puntuacion} 
+                    <input
+                        value={formEdicion.puntuacion}
                         onChange={(e) => setFormEdicion({...formEdicion, puntuacion: e.target.value})}
                     />
-                    <input 
-                        value={formEdicion.notas} 
+                    <input
+                        value={formEdicion.notas}
                         onChange={(e) => setFormEdicion({...formEdicion, notas: e.target.value})}
-                    />    
+                    />
 
                     <button onClick={async () => {
                         await guardarItem({ ...item, ...formEdicion })
@@ -77,7 +87,7 @@ const Card = forwardRef(function Card({ item, onCambio }, ref) {
                     <button onClick={() => setEditando(false)}>Cancelar</button>
                 </>
             ) : (
-                <> {/* Fragment: contenedor invisible para no usar div*/}
+                <>
                     <p className="numero">#{item.atributos.numeroEstampa}</p>
                     <p className="jugador">{item.atributos.jugador}</p>
                     <p className="seleccion">{item.atributos.seleccion}</p>
@@ -92,14 +102,14 @@ const Card = forwardRef(function Card({ item, onCambio }, ref) {
                             {categoria ? `${categoria.emoji} ${categoria.nombre}` : item.categoriaId}
                         </span>
                     </p>
+                    <p>Estado: {item.estado}</p>
                     <p>Puntuación: {item.puntuacion}/10</p>
                     <p>Notas: {item.notas}</p>
 
-                    {/* ()=> se ejecuta solo cuando usuario hace clic */}
-                    <button className="btn-eliminar" onClick={async () => {
-                        await eliminarItem(item.id)
-                        if (onCambio) onCambio()
-                    }}>Eliminar</button>
+                    <button className="btn-estado" onClick={handleClickEstado}>
+                        {item.estado === 'completado' ? 'Marcar pendiente' : 'Marcar completado'}
+                    </button>
+                    <button className="btn-eliminar" onClick={handleClickEliminar}>Eliminar</button>
                     <button className="btn-editar" onClick={() => setEditando(true)}>Editar</button>
                 </>
             )}
@@ -107,4 +117,4 @@ const Card = forwardRef(function Card({ item, onCambio }, ref) {
     )
 })
 
-export default Card
+export default memo(Card)
