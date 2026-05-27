@@ -7,6 +7,9 @@ const Card = forwardRef(function Card({ item, onCambio }, ref) {
     const { guardarItem, eliminarItem } = useStorage()
     const categoria = CATEGORIAS.find((cat) => cat.id === item.categoriaId)
     const colorCategoria = categoria?.color || 'var(--color-text-muted)'
+    // Fondo del mismo color de la categoría pero con baja opacidad (1A ≈ 10%).
+    // Solo se aplica si hay un hex real; si no, se usa la superficie por defecto.
+    const fondoCategoria = categoria ? `${categoria.color}1A` : 'var(--color-surface)'
     const [editando, setEditando] = useState(false)
     const [formEdicion, setFormEdicion] = useState({
         nombre: item.nombre,
@@ -24,7 +27,14 @@ const Card = forwardRef(function Card({ item, onCambio }, ref) {
     })
     
     return (
-        <div className="card" ref={ref} style={{ borderLeft: `4px solid ${colorCategoria}` }}>
+        <div
+            className="card"
+            ref={ref}
+            style={{
+                border: `2px solid ${colorCategoria}`,
+                backgroundColor: fondoCategoria
+            }}
+        >
             {editando ? (
                 <>
                     <input 
