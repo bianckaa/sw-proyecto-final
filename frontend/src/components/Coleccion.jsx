@@ -1,13 +1,11 @@
 import { useRef, useEffect } from 'react'
 import Card from './Card'
 
-function Coleccion({ items, onCambio }) {
+function Coleccion({ items, onCambio, onEliminar, onCambiarEstado }) {
     const itemsActivos = items.filter((item) => item.activo === true)
 
-    // useRef — guarda la referencia al div del último ítem sin causar re-render
     const lastItemRef = useRef(null)
 
-    // Cada vez que cambia la lista, desplaza la vista hasta el ítem más reciente
     useEffect(() => {
         lastItemRef.current?.scrollIntoView({ behavior: 'smooth' })
     }, [items])
@@ -19,6 +17,8 @@ function Coleccion({ items, onCambio }) {
             key={item.id}
             item={item}
             onCambio={onCambio}
+            onEliminar={onEliminar}
+            onCambiarEstado={onCambiarEstado}
             ref={index === itemsActivos.length - 1 ? lastItemRef : null}
         />
         ))}
