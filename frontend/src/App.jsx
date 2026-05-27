@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { FaMoon, FaSun } from 'react-icons/fa'
 import './App.css'
 import Formulario from './components/Formulario'
 import Coleccion from './components/Coleccion'
@@ -42,20 +43,34 @@ function Contenido() {
 
   return (
     <div>
-      <h1>Albúm Copa Mundial de Fútbol 2026</h1>
+      <div className="controles-superiores">
+        <select
+          className="selector-modo"
+          value={modo}
+          onChange={(e) => setModo(e.target.value)}
+          aria-label="Modo de almacenamiento"
+        >
+          <option value="local">Modo Local</option>
+          <option value="api">Modo API</option>
+        </select>
 
-      <button className="btn-tema" onClick={toggleTema}>
-        {tema === 'claro' ? '🌑 Oscuro' : '☀ Claro'}
-      </button>
-
-      <div className="selector-modo">
-        <span>Modo activo: <strong>{modo === 'api' ? 'API (backend)' : 'Local (navegador)'}</strong></span>
-        <button onClick={() => setModo(modo === 'local' ? 'api' : 'local')}>
-          Cambiar a {modo === 'local' ? 'API' : 'Local'}
+        <button
+          className="toggle-tema"
+          data-tema={tema}
+          onClick={toggleTema}
+          aria-label={tema === 'claro' ? 'Activar tema oscuro' : 'Activar tema claro'}
+        >
+          <span className="toggle-knob" />
+          <FaSun className="icono-sol" />
+          <FaMoon className="icono-luna" />
         </button>
       </div>
 
+      <h1>Albúm Copa Mundial de Fútbol 2026</h1>
+
       <Formulario ref={nombreRef} onGuardado={recargar} />
+
+      <hr className="divisor-secciones" />
 
       <Coleccion items={items} onCambio={recargar} />
     </div>

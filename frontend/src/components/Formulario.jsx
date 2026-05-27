@@ -12,9 +12,9 @@ const Formulario = forwardRef(function Formulario({ onGuardado }, inputRef) {
         nombre: '',
         categoriaId: '',
         estado: '',
-        puntuacion: 0,
+        puntuacion: '',
         notas: '',
-        numeroEstampa: 0,
+        numeroEstampa: '',
         seleccion: '',
         jugador: '',
         pegada: false
@@ -48,9 +48,9 @@ const Formulario = forwardRef(function Formulario({ onGuardado }, inputRef) {
             nombre: '',
             categoriaId: '',
             estado: '',
-            puntuacion: 0,
+            puntuacion: '',
             notas: '',
-            numeroEstampa: 0,
+            numeroEstampa: '',
             seleccion: '',
             jugador: '',
             pegada: false
@@ -76,12 +76,12 @@ const Formulario = forwardRef(function Formulario({ onGuardado }, inputRef) {
     return (
         <div className="formulario">
             <h2>Nueva Estampa</h2>
-            <input ref={inputRef} name="nombre" value={form.nombre} onChange={percibirCambio} placeholder="Nombre" />
-            
-            <input name="numeroEstampa" type="number" value={form.numeroEstampa} onChange={percibirCambio} />
+            <input ref={inputRef} name="nombre" value={form.nombre} onChange={percibirCambio} placeholder="Nombre (ej: La cabra)" />
 
-            <select name="categoriaId" value={form.categoriaId} onChange={percibirCambio}>
-            <option value="">-- Categoría --</option>
+            <input name="numeroEstampa" type="number" value={form.numeroEstampa} onChange={percibirCambio} placeholder="Número de estampa (ej: 142)" />
+
+            <select name="categoriaId" value={form.categoriaId} onChange={percibirCambio} required>
+            <option value="" disabled hidden>Categoría</option>
             {CATEGORIAS.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                     {cat.emoji} {cat.nombre}
@@ -93,21 +93,21 @@ const Formulario = forwardRef(function Formulario({ onGuardado }, inputRef) {
             
             <input name="jugador" value={form.jugador} onChange={percibirCambio} placeholder="Jugador (ej: Messi)" />
 
-            <select name="estado" value={form.estado} onChange={percibirCambio}>
-            <option value="">-- Estado --</option>
+            <select name="estado" value={form.estado} onChange={percibirCambio} required>
+            <option value="" disabled hidden>Estado</option>
             <option value="pendiente">Pendiente</option>
             <option value="completado">Completado</option>
             </select>
 
-            <input name="puntuacion" type="number" min="0" max="10" value={form.puntuacion} onChange={percibirCambio} />
+            <input name="puntuacion" type="number" min="0" max="10" value={form.puntuacion} onChange={percibirCambio} placeholder="Puntuación (0-10)" />
 
             <input name="notas" value={form.notas} onChange={percibirCambio} placeholder="Notas"></input>
-            <label>
-                <input 
-                    type="checkbox" 
-                    name="pegada" 
-                    checked={form.pegada} 
-                    onChange={percibirCambio} 
+            <label className="chip-pegada">
+                <input
+                    type="checkbox"
+                    name="pegada"
+                    checked={form.pegada}
+                    onChange={percibirCambio}
                 />Pegada en el álbum
             </label>
             <button className="btn-guardar" onClick={manejarClick}>Guardar</button>
