@@ -1,5 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700;900&display=swap');
 
+/* Tipografía oficial FIFA World Cup 2026 (autoalojada) para los títulos */
+@font-face {
+  font-family: 'FWC2026';
+  src: url('./assets/fonts/FWC2026-SemiExpandedBlack.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -7,14 +16,22 @@
   font-family: 'Noto Sans', sans-serif;
 }
 
+/* El lienzo raíz (html) también lleva la imagen para que NO quede ninguna
+   franja oscura detrás del body al hacer scroll o en modo oscuro del SO */
+:root {
+  background: url('./assets/fondo.png') center center / cover no-repeat fixed;
+}
+
 body {
-  background-color: var(--color-bg);
+  /* Fondo de la página: imagen que se adapta automáticamente al tamaño */
+  background: url('./assets/fondo.png') center center / cover no-repeat fixed;
   color: var(--color-text);
   min-height: 100vh;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 h1 {
+  font-family: 'FWC2026', 'Noto Sans', sans-serif;
   font-size: 2rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -25,6 +42,7 @@ h1 {
 }
 
 h2 {
+  font-family: 'FWC2026', 'Noto Sans', sans-serif;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--color-primary);
@@ -41,6 +59,10 @@ h2 {
   padding: 1.5rem;
 }
 
+.formulario h2 {
+  color: var(--color-accent);
+}
+
 .formulario input,
 .formulario select,
 .formulario textarea {
@@ -52,6 +74,11 @@ h2 {
   border-radius: 4px;
   margin-bottom: 0.75rem;
   font-size: 0.95rem;
+}
+
+/* Select sin selección: se muestra atenuado como un placeholder */
+.formulario select:invalid {
+  color: var(--color-text-muted);
 }
 
 .formulario input:focus,
@@ -66,6 +93,50 @@ h2 {
   color: var(--color-primary);
   margin-bottom: 0.25rem;
   text-transform: uppercase;
+}
+
+/* Checkbox "Pegada" estilo chip/píldora */
+.formulario label.chip-pegada {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: auto;
+  padding: 0.45rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-text-muted);
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: none;
+  user-select: none;
+  margin-bottom: 0.75rem;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Ocultamos el checkbox nativo; el propio chip funciona como control */
+.formulario label.chip-pegada input {
+  display: none;
+}
+
+/* Ícono al inicio: "+" cuando NO está marcado */
+.formulario label.chip-pegada::before {
+  content: '+';
+  font-weight: 900;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Estado marcado: chip relleno en verde con "✓" */
+.formulario label.chip-pegada:has(input:checked) {
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: var(--color-on-color);
+}
+
+.formulario label.chip-pegada:has(input:checked)::before {
+  content: '✓';
 }
 
 /* BOTONES */
@@ -85,6 +156,15 @@ h2 {
 .btn-guardar:hover {
   background: var(--color-warn);
   color: var(--color-on-warn);
+}
+
+/* DIVISOR ENTRE FORMULARIO Y COLECCIÓN */
+.divisor-secciones {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  max-width: 900px;
+  margin: 0.5rem auto 1rem;
+  opacity: 0.5;
 }
 
 /* COLECCIÓN */
@@ -163,16 +243,90 @@ h2 {
   font-size: 0.8rem;
 }
 
-.btn-tema {
-  display: block;
-  margin: 0 auto 1rem;
-  background: var(--color-primary);
+.controles-superiores {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  padding: 1rem 1rem 0;
+}
+
+.toggle-tema {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  width: 64px;
+  height: 36px;
+  padding: 0 8px;
+  border: 1px solid var(--color-success);
+  border-radius: 999px;
+  background: var(--color-success-soft);
+  cursor: pointer;
+}
+
+/* Círculo deslizante que resalta el tema activo */
+.toggle-knob {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-success);
+  transition: transform 0.2s ease;
+}
+
+.toggle-tema[data-tema='oscuro'] .toggle-knob {
+  transform: translateX(28px);
+}
+
+.toggle-tema svg {
+  position: relative;
+  z-index: 1;
+  width: 15px;
+  height: 15px;
+  color: var(--color-text-muted);
+  transition: color 0.2s ease;
+}
+
+/* El ícono que queda sobre el círculo se muestra en color de contraste */
+.toggle-tema[data-tema='claro'] .icono-sol {
   color: var(--color-on-color);
-  border: none;
-  padding: 0.5rem 1.2rem;
-  border-radius: 4px;
+}
+
+.toggle-tema[data-tema='oscuro'] .icono-luna {
+  color: var(--color-on-color);
+}
+
+.selector-modo {
+  box-sizing: border-box;
+  height: 36px;
+  background: var(--color-success-soft);
+  color: var(--color-success);
+  border: 1px solid var(--color-success);
+  border-radius: 999px;
+  padding: 0 0.9rem;
   cursor: pointer;
   font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.selector-modo:focus {
+  outline: none;
+  border-color: var(--color-success);
+}
+
+/* Lista desplegada: la opción seleccionada se resalta (soportado en Firefox) */
+.selector-modo option {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.selector-modo option:checked {
+  background: var(--color-success);
+  color: var(--color-on-color);
 }
 
 .btn-eliminar:hover { background: var(--color-accent); color: var(--color-on-color); }
