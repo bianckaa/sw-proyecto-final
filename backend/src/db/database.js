@@ -1,6 +1,8 @@
 const Database = require('better-sqlite3')
+const path = require('path')
 
-const db = new Database('estampas.sqlite')
+const dbPath = path.join(__dirname, '..', '..', 'estampas.sqlite')
+const db = new Database(dbPath)
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS items (
