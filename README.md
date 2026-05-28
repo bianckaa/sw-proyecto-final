@@ -36,11 +36,13 @@ El servidor corre en http://localhost:3000.
 | PUT | /api/items/:id | Actualiza una estampa |
 | DELETE | /api/items/:id | Archiva una estampa |
 | POST | /api/items/:id/registro | Crea un registro de actividad |
+___
 
 ## Mis primeros Items
 A continuación se muestran las primeras estampas reales registradas en la aplicación:
 
 ![Estampas](./assets/img/captura_items.png)
+___
 
 ## Mi paleta de colores
 
@@ -74,3 +76,61 @@ tema claro y otra para el tema oscuro.
 |--------|----------------------------------|------|
 | Ctrl+N | Enfocar el campo de nombre       | Requiere abrir la app en modo aplicación para evitar conflicto con Chrome: `"C:\Program Files\Google\Chrome\Application\chrome.exe" --app=http://localhost:5173` |
 | T      | Alternar entre tema claro/oscuro | Funciona directamente en el navegador |
+___
+
+## Medición con React DevTools Profiler
+
+### Capturas
+
+**Antes de la optimización**
+![Profiler antes](docs/profiler-antes.png)
+
+**Después de la optimización** 
+![Profiler después](docs/profiler-despues.png)
+
+### Análisis
+
+Antes de la optimización, escribir una sola letra en el buscador disparaba el
+re-render de los 25 Cards, aunque ninguno de ellos hubiera cambiado. Esto ocurría
+porque `listaFiltrada` se recalculaba en cada render de `Contenido` produciendo una
+nueva referencia de array, y los handlers `onEliminar` y `onCambiarEstado` también
+se recreaban, lo que hacía que `React.memo` no pudiera comparar las props
+correctamente. Después de envolver `Card` con `React.memo`, memoizar `listaFiltrada`
+con `useMemo` y estabilizar los handlers con `useCallback`, los Cards reciben
+exactamente las mismas referencias de props entre renders y React los omite por
+completo, reduciendo el tiempo de commit de ~197 ms a ~3 ms por pulsación de tecla.
+
+## Mi gráfica original
+
+La tercera gráfica es un BarChart horizontal que muestra
+el top 5 de selecciones nacionales con más estampas en mi colección. Agrupa los
+items por `atributos.seleccion`, cuenta cuántos hay por selección, ordena
+descendente y se queda con las 5 primeras.
+
+**Por qué la elegí para el tema del álbum del Mundial 2026**: el álbum se completa
+por selecciones, no por categorías visuales. Saber qué selecciones tengo más
+avanzadas me dice cuáles puedo terminar pronto y, por contraste, qué
+selecciones casi no aparecen me indica dónde tengo que enfocarme para no quedarme
+atorada al final con países difíciles de conseguir.
+
+## Mis 3 decisiones técnicas
+
+### (1) Estructura del reducer
+Separé las acciones en tres grupos: hidratación (`HIDRATAR`), mutaciones sobre la
+lista (`AGREGAR`, `ELIMINAR`, `CAMBIAR_ESTADO`, `REGISTRAR_ACTIVIDAD`) y filtros
+(`FILTRAR`, `LIMPIAR_FILTROS`). `FILTRAR` recibe `{ campo, valor }` en lugar de
+crear una acción por cada filtro, ya que esto evita repetir tres acciones casi idénticas
+y mantiene el `switch` corto.
+
+### (2) Acción más difícil
+`ELIMINAR` fue la más compleja porque la rúbrica pide *soft delete* (`activo=false`)
+y no remover del array. Si lo eliminaba físicamente, perdía datos al recargar y la
+gráfica de actividad no podía mostrar histórico. Lo resolví usando `.map()` para
+clonar la lista y solo voltear `activo` del item afectado permitiendo restaurar items en el futuro.
+
+### (3) Gráfica más compleja
+La `GraficaActividad` fue la más laborosa porque tiene que rellenar días vacíos
+con cero. Construyo primero un arreglo base de 7 días con `cantidad: 0` usando
+`new Date()` y `setDate(hoy - i)`, luego recorro `listaFiltrada` y sumo +1 al día
+que coincide con `fechaRegistro`. Esto garantiza que la barra de un día
+sin registros aparezca como hueco visible y no se "salte" del eje X.
