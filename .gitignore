@@ -1,4 +1,22 @@
+# Dependencias
 node_modules/
-.env
-*.sqlite
 
+# Bases de datos locales
+*.sqlite
+*.db
+
+# Variables de entorno (NUNCA a GitHub)
+.env
+.env.local
+.env.production.local
+
+# Build del frontend
+dist/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

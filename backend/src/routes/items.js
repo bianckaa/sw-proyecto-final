@@ -1,67 +1,132 @@
 const express = require('express')
 const router = express.Router()
-const db = require('../db/database')
 const { randomUUID } = require('crypto')
+const { pool } = require('../db/conexion')
 
-// GET /api/items (devuelve todos los activos)
-router.get('/', (req, res) => {
-  const items = db.prepare('SELECT * FROM items WHERE activo = 1').all()
-  const itemsFormateados = items.map((item) => ({
-    ...item,
-    atributos: JSON.parse(item.atributos),
-    activo: item.activo === 1
-  }))
-  res.json(itemsFormateados)
+// Helper: convierte una fila de Postgres al formato esperado por el frontend.
+// Los atributos se guardan como texto JSON, hay que parsearlos antes de enviarlos.
+const formatearItem = (fila) => ({
+  ...fila,
+  atributos: fila.atributos ? JSON.parse(fila.atributos) : {},
+  activo: fila.activo === 1
 })
 
-// POST /api/items (crea un item nuevo)
-router.post('/', (req, res) => {
-  const item = req.body
-  db.prepare(`
-    INSERT INTO items (id, nombre, categoriaId, estado, puntuacion, fechaRegistro, fechaActividad, notas, atributos, activo)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(
-    item.id, item.nombre, item.categoriaId, item.estado, item.puntuacion,
-    item.fechaRegistro, item.fechaActividad, item.notas,
-    JSON.stringify(item.atributos), item.activo ? 1 : 0
-  )
-  res.status(201).json(item)
+// GET /api/items — devuelve todos los items activos
+router.get('/', async (req, res) => {
+  try {
+    const resultado = await pool.query(
+      'SELECT * FROM items WHERE activo = $1',
+      [1]
+    )
+    res.json(resultado.rows.map(formatearItem))
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error interno del servidor' })
+  }
 })
 
-// PUT /api/items/:id (actualiza un item)
-router.put('/:id', (req, res) => {
-  const { id } = req.params
-  const item = req.body
-  db.prepare(`
-    UPDATE items SET nombre=?, categoriaId=?, estado=?, puntuacion=?,
-    fechaActividad=?, notas=?, atributos=?, activo=?
-    WHERE id=?
-  `).run(
-    item.nombre, item.categoriaId, item.estado, item.puntuacion,
-    item.fechaActividad, item.notas, JSON.stringify(item.atributos),
-    item.activo ? 1 : 0, id
-  )
-  res.json({ mensaje: 'Item actualizado' })
+// GET /api/items/:id — devuelve un item por id
+router.get('/:id', async (req, res) => {
+  try {
+    const resultado = await pool.query(
+      'SELECT * FROM items WHERE id = $1',
+      [req.params.id]
+    )
+    if (resultado.rows.length === 0) {
+      return res.status(404).json({ error: 'Item no encontrado' })
+    }
+    res.json(formatearItem(resultado.rows[0]))
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error interno del servidor' })
+  }
 })
 
-// DELETE /api/items/:id (archiva un item (soft delete))
-router.delete('/:id', (req, res) => {
-  const { id } = req.params
-  db.prepare('UPDATE items SET activo=0 WHERE id=?').run(id)
-  res.json({ mensaje: 'Item archivado' })
+// POST /api/items — crea un item nuevo
+router.post('/', async (req, res) => {
+  try {
+    const item = req.body
+    await pool.query(
+      `INSERT INTO items
+        (id, nombre, "categoriaId", estado, puntuacion,
+         "fechaRegistro", "fechaActividad", notas, atributos, activo)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [
+        item.id,
+        item.nombre,
+        item.categoriaId,
+        item.estado,
+        item.puntuacion,
+        item.fechaRegistro,
+        item.fechaActividad,
+        item.notas,
+        JSON.stringify(item.atributos || {}),
+        item.activo ? 1 : 0
+      ]
+    )
+    res.status(201).json(item)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error interno del servidor' })
+  }
 })
 
-// POST /api/items/:id/registro (crea un registro de actividad)
-router.post('/:id/registro', (req, res) => {
-  const { id } = req.params
-  const registro = req.body
-  db.prepare(`
-    INSERT INTO registros (id, itemId, fecha, valor, notas)
-    VALUES (?, ?, ?, ?, ?)
-  `).run(
-    randomUUID(), id, registro.fecha, registro.valor, registro.notas
-  )
-  res.status(201).json({ mensaje: 'Registro creado' })
+// PUT /api/items/:id — actualiza un item existente
+router.put('/:id', async (req, res) => {
+  try {
+    const item = req.body
+    await pool.query(
+      `UPDATE items
+       SET nombre=$1, "categoriaId"=$2, estado=$3, puntuacion=$4,
+           "fechaActividad"=$5, notas=$6, atributos=$7, activo=$8
+       WHERE id=$9`,
+      [
+        item.nombre,
+        item.categoriaId,
+        item.estado,
+        item.puntuacion,
+        item.fechaActividad,
+        item.notas,
+        JSON.stringify(item.atributos || {}),
+        item.activo ? 1 : 0,
+        req.params.id
+      ]
+    )
+    res.json({ mensaje: 'Item actualizado' })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error interno del servidor' })
+  }
+})
+
+// DELETE /api/items/:id — soft delete (activo=0)
+router.delete('/:id', async (req, res) => {
+  try {
+    await pool.query(
+      'UPDATE items SET activo = $1 WHERE id = $2',
+      [0, req.params.id]
+    )
+    res.json({ mensaje: 'Item archivado' })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error interno del servidor' })
+  }
+})
+
+// POST /api/items/:id/registro — crea un registro de actividad
+router.post('/:id/registro', async (req, res) => {
+  try {
+    const registro = req.body
+    await pool.query(
+      `INSERT INTO registros (id, "itemId", fecha, valor, notas)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [randomUUID(), req.params.id, registro.fecha, registro.valor, registro.notas]
+    )
+    res.status(201).json({ mensaje: 'Registro creado' })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error interno del servidor' })
+  }
 })
 
 module.exports = router
