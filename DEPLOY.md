@@ -1,77 +1,75 @@
 # Guía de Deploy
 
+## Arquitectura
+
+Un solo proyecto en Vercel sirve tanto el frontend como el backend:
+
+```
+https://tu-app.vercel.app/          → frontend React (Vite)
+https://tu-app.vercel.app/api/*     → backend Express (serverless)
+https://tu-app.vercel.app/api/health → endpoint de salud
+                  ↓
+            Supabase (PostgreSQL)
+```
+
 ## Paso 1 — Base de datos en Supabase
 
 1. Ve a https://supabase.com y crea cuenta gratuita (puedes entrar con GitHub)
 2. Clic en "New project"
-3. Elige un nombre de proyecto: album-mundial
-4. Escribe una contraseña segura para la base de datos — GUÁRDALA, la necesitarás
+3. Nombre de proyecto: album-mundial
+4. Escribe una contraseña segura — GUÁRDALA
    IMPORTANTE: si usas caracteres especiales (@, #, !) en la contraseña,
-   deberás codificarlos en URL al armar la cadena de conexión (@→%40, #→%23, !→%21)
-5. Selecciona la región: East US (Ohio) o la más cercana disponible
-6. Clic en "Create new project" y espera ~2 minutos a que inicialice
-7. Una vez listo, ve a: Settings (ícono engranaje) → Database
-8. Baja hasta la sección "Connection string" y selecciona la pestaña "URI"
-9. Copia la cadena completa. Tiene este formato:
+   codifícalos en URL: @→%40, #→%23, !→%21
+5. Región: East US (Ohio) o la más cercana
+6. Clic en "Create new project" — espera ~2 minutos
+7. Ve a: Settings (engranaje) → Database
+8. Sección "Connection string" → pestaña "URI"
+9. Copia la cadena. Formato:
    postgresql://postgres:[TU-PASSWORD]@db.XXXX.supabase.co:5432/postgres
-10. Reemplaza [TU-PASSWORD] con la contraseña que escribiste en el Paso 4
-11. Guarda esa cadena — la usarás en el Paso 2 y en tu archivo .env local
+10. Reemplaza [TU-PASSWORD] con tu contraseña del Paso 4
+11. Guarda esa cadena — la usarás en el Paso 2
 
-AVISO DE PLAN GRATUITO: Supabase pausa proyectos con más de 1 semana
-sin actividad. Si el evaluador visita la app y el backend no responde,
-entra a tu dashboard de Supabase → tu proyecto → clic en "Restore project".
-Tarda ~1 minuto en reactivarse.
+AVISO: Supabase pausa proyectos sin actividad por más de 1 semana.
+Si el backend no responde, ve a tu dashboard → tu proyecto → "Restore project" (~1 min).
 
-## Paso 2 — Backend en Vercel
+## Paso 2 — Deploy en Vercel (frontend + backend juntos)
 
-1. Ve a https://vercel.com (misma cuenta que usarás para el frontend)
+1. Ve a https://vercel.com y crea cuenta con GitHub
 2. New Project → importa tu repositorio de GitHub
-3. Configuración:
-   - Root Directory: backend
+3. Configuración importante:
+   - Root Directory: . (dejar en blanco / raíz del repositorio)
    - Framework Preset: Other
-   - Build Command: (dejar vacío)
-   - Output Directory: (dejar vacío)
-4. En "Environment Variables" agrega:
-   - DATABASE_URL = (la cadena de Supabase del Paso 1)
-   - FRONTEND_URL = (déjalo vacío por ahora, lo completas después del Paso 3)
-   - NODE_ENV = production
-5. Clic en "Deploy" — espera 1-2 minutos
-6. Copia la URL del backend: https://album-mundial-api.vercel.app (o similar)
-7. Prueba que funciona visitando en el navegador:
-   https://TU-URL-BACKEND.vercel.app/api/health
-   Debe responder: {"estado":"ok","mensaje":"Backend y BD funcionando"}
+   - Build Command: (Vercel lo leerá del vercel.json — no cambiar)
+   - Output Directory: (igual, lo lee del vercel.json)
+4. En "Environment Variables" agrega UNA sola variable:
+   - DATABASE_URL = postgresql://postgres:[TU-PASSWORD]@db.XXXX.supabase.co:5432/postgres
+     (la cadena del Paso 1)
+5. Clic en "Deploy" — espera 2-3 minutos
+6. Copia tu URL: https://album-mundial-XXXX.vercel.app
 
-## Paso 3 — Frontend en Vercel
+## Paso 3 — Verificación final
 
-1. En Vercel, New Project → importa el mismo repositorio de GitHub
-   (Vercel permite múltiples proyectos desde el mismo repo)
-2. Configuración:
-   - Root Directory: frontend
-   - Framework Preset: Vite
-   - Build Command: npm run build
-   - Output Directory: dist
-3. En "Environment Variables" agrega:
-   - VITE_API_URL = https://TU-URL-BACKEND.vercel.app
-     (la URL del Paso 2, SIN barra al final)
-4. Clic en "Deploy" — espera 1-2 minutos
-5. Copia la URL del frontend: https://album-mundial.vercel.app (o similar)
+Abre tu URL de Vercel y confirma:
+- [ ] La página carga sin errores en la consola (F12)
+- [ ] Visita https://TU-URL.vercel.app/api/health — debe responder {"estado":"ok",...}
+- [ ] Cambia a "Modo API" y crea un ítem — aparece en la lista
+- [ ] Recarga la página — el ítem persiste (guardado en Supabase)
+- [ ] Cambia a "Modo Local" — también funciona
+- [ ] Las gráficas muestran datos
+- [ ] El tema claro/oscuro funciona
 
-## Paso 4 — Actualizar CORS en el backend
+## Variables de entorno necesarias en Vercel
 
-1. Ve al proyecto de backend en Vercel
-2. Settings → Environment Variables → edita FRONTEND_URL:
-   - FRONTEND_URL = https://TU-URL-FRONTEND.vercel.app
-     (la URL del Paso 3, SIN barra al final)
-3. Ve a Deployments → los tres puntos del último deploy → Redeploy
-4. Espera que termine (~1 minuto)
+| Variable       | Valor                              | Quién la usa |
+|----------------|------------------------------------|--------------|
+| DATABASE_URL   | cadena de conexión de Supabase     | backend      |
 
-## Paso 5 — Verificación final
+No se necesita FRONTEND_URL (mismo dominio, sin CORS).
+No se necesita VITE_API_URL (URL relativa /api/...).
 
-Abre tu URL del frontend y confirma que todo funciona:
-- [ ] La página carga sin errores en la consola del navegador (F12)
-- [ ] Cambia a "Modo API" y crea un ítem — debe aparecer en la lista
-- [ ] Recarga la página — el ítem debe seguir ahí (persistencia en Supabase)
-- [ ] Cambia a "Modo Local" — también debe funcionar
-- [ ] Las gráficas se muestran con datos
-- [ ] El tema claro/oscuro cambia con el botón o atajo de teclado
-- [ ] Visita https://TU-URL-BACKEND.vercel.app/api/health — debe responder ok
+## Desarrollo local
+
+1. Copia backend/.env.example a backend/.env y pon tu DATABASE_URL real
+2. En una terminal: cd backend && npm run dev
+3. En otra terminal: cd frontend && npm run dev
+4. El proxy de Vite enruta /api/* → localhost:3000 automáticamente
