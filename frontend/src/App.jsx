@@ -12,14 +12,32 @@ import { itemsReducer, initialState } from './reducers/itemsReducer'
 import { CATEGORIAS } from './utils/categorias'
 import { useAtajoTeclado } from './hooks/useAtajoTeclado'
 import { useProgreso } from './hooks/useProgreso'
+import { useLocalStorage } from './hooks/useLocalStorage'
 
 function Contenido() {
-  const { modo, setModo, obtenerItems, eliminarItem } = useStorage()
+  const { modo, setModo, obtenerItems, eliminarItem, error, limpiarError } = useStorage()
   const { tema, toggleTema } = useTheme()
   const [state, dispatch] = useReducer(itemsReducer, initialState)
   const { lista, filtroCategoria, filtroEstado, busqueda } = state
 
   const nombreRef = useRef(null)
+
+  // RF-06: perfil de usuario con nombre persistido en localStorage.
+  // El hook useLocalStorage mantiene el valor sincronizado entre recargas.
+  const [nombreUsuario, setNombreUsuario] = useLocalStorage('nombreUsuario', '')
+
+  // RF-06: saludo dinamico segun la hora del dia.
+  // Si el usuario ya escribio su nombre, lo agregamos al saludo.
+  const horaActual = new Date().getHours()
+  const saludoBase =
+    horaActual < 12
+      ? 'Buenos días'
+      : horaActual < 18
+      ? 'Buenas tardes'
+      : 'Buenas noches'
+  const saludo = nombreUsuario
+    ? `${saludoBase}, ${nombreUsuario}`
+    : `${saludoBase}, bienvenida a tu álbum`
 
   const recargar = useCallback(async () => {
     const data = await obtenerItems()
@@ -30,11 +48,11 @@ function Contenido() {
     recargar()
   }, [modo])
 
-  // Atajos de teclado declarativos: la tecla "n" enfoca el formulario,
-  // la tecla "t" alterna entre tema claro y oscuro
+  // Atajos de teclado declarativos: Ctrl+N enfoca el campo nombre del
+  // formulario y la tecla T sola alterna entre tema claro y oscuro
   const atajos = useMemo(
     () => ({
-      n: () => nombreRef.current?.focus(),
+      'ctrl+n': () => nombreRef.current?.focus(),
       t: toggleTema,
     }),
     [toggleTema]
@@ -121,10 +139,6 @@ function Contenido() {
     [eliminarItem]
   )
 
-  const handleCambiarEstado = useCallback((id) => {
-    dispatch({ type: 'CAMBIAR_ESTADO', payload: id })
-  }, [])
-
   // Items activos (no archivados) usados por el hook de progreso del album
   const itemsActivos = useMemo(
     () => state.lista.filter((item) => item.activo),
@@ -159,10 +173,36 @@ function Contenido() {
 
       <h1>Albúm Copa Mundial de Fútbol 2026</h1>
 
+      {/* RF-06: input del nombre del usuario, persistido en localStorage */}
+      <div className="perfil-usuario">
+        <label htmlFor="input-nombre-usuario">Tu nombre:</label>
+        <input
+          id="input-nombre-usuario"
+          type="text"
+          value={nombreUsuario}
+          onChange={(e) => setNombreUsuario(e.target.value)}
+          placeholder="Escribe tu nombre"
+        />
+      </div>
+
+      {/* RF-06: saludo dinamico que cambia segun la hora del dia y el nombre */}
+      <p className="saludo-dinamico">{saludo}</p>
+
+      {/* RF-02: banner visible cuando una llamada al backend falla.
+          El usuario puede cerrarlo y seguir trabajando en modo Local. */}
+      {error && (
+        <div className="banner-error" role="alert">
+          <span>{error}</span>
+          <button onClick={limpiarError} aria-label="Cerrar mensaje de error">×</button>
+        </div>
+      )}
+
       <p className="indicador-progreso">
         Colección: {progreso.totalColectadas} estampas · {progreso.porcentaje}% del álbum
         {progreso.rachaActual > 0 && ` · racha de ${progreso.rachaActual} completadas`}
       </p>
+
+      <EstadisticasResumen estadisticas={estadisticas} />
 
       <Formulario ref={nombreRef} onGuardado={recargar} />
 
@@ -173,15 +213,10 @@ function Contenido() {
         dispatch={dispatch}
       />
 
-      <EstadisticasResumen estadisticas={estadisticas} />
-
-      <hr className="divisor-secciones" />
-
       <Coleccion
         items={listaFiltrada}
         onCambio={recargar}
         onEliminar={handleEliminar}
-        onCambiarEstado={handleCambiarEstado}
       />
 
       <PanelGraficas

@@ -113,6 +113,21 @@ router.delete('/:id', async (req, res) => {
   }
 })
 
+// GET /api/items/:id/registros — devuelve el historial de actividad del item
+// ordenado del mas reciente al mas antiguo
+router.get('/:id/registros', async (req, res) => {
+  try {
+    const resultado = await pool.query(
+      'SELECT id, fecha, valor, notas FROM registros WHERE "itemId" = $1 ORDER BY fecha DESC',
+      [req.params.id]
+    )
+    res.json(resultado.rows)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error interno del servidor' })
+  }
+})
+
 // POST /api/items/:id/registro — crea un registro de actividad
 router.post('/:id/registro', async (req, res) => {
   try {

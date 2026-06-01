@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import {
   BarChart,
   Bar,
@@ -8,8 +9,21 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from 'recharts'
+import { useTheme } from '../../context/ThemeProvider'
 
 function GraficaActividad({ datos }) {
+  // Leemos el color de las variables CSS para que responda al cambio de tema.
+  // tema es la dependencia: cuando cambia, recalculamos el color.
+  const { tema } = useTheme()
+  const [color, setColor] = useState('#1B4FBB')
+
+  useEffect(() => {
+    const valor = getComputedStyle(document.body)
+      .getPropertyValue('--color-grafica-1')
+      .trim()
+    if (valor) setColor(valor)
+  }, [tema])
+
   return (
     <div className="grafica">
       <h3>Actividad últimos 7 días</h3>
@@ -20,7 +34,7 @@ function GraficaActividad({ datos }) {
           <YAxis allowDecimals={false} />
           <Tooltip />
           <Legend />
-          <Bar dataKey="cantidad" name="Estampas registradas" fill="#1B4FBB" />
+          <Bar dataKey="cantidad" name="Estampas registradas" fill={color} />
         </BarChart>
       </ResponsiveContainer>
     </div>
