@@ -1,4 +1,4 @@
-import { useReducer, useEffect, useRef, useMemo, useCallback } from 'react'
+import { useReducer, useEffect, useRef, useMemo, useCallback, useState } from 'react'
 import { FaMoon, FaSun } from 'react-icons/fa'
 import './App.css'
 import Formulario from './components/Formulario'
@@ -21,6 +21,19 @@ function Contenido() {
   const { lista, filtroCategoria, filtroEstado, busqueda } = state
 
   const nombreRef = useRef(null)
+
+  // Reloj en tiempo real: guardamos el ID del intervalo en un ref para
+  // poder cancelarlo al desmontar sin provocar re-renders con cada tick
+  const intervalRef = useRef(null)
+  const [horaTexto, setHoraTexto] = useState(
+    () => new Date().toLocaleTimeString('es-GT')
+  )
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      setHoraTexto(new Date().toLocaleTimeString('es-GT'))
+    }, 1000)
+    return () => clearInterval(intervalRef.current)
+  }, [])
 
   // RF-06: perfil de usuario con nombre persistido en localStorage.
   // El hook useLocalStorage mantiene el valor sincronizado entre recargas.
@@ -185,8 +198,8 @@ function Contenido() {
         />
       </div>
 
-      {/* RF-06: saludo dinamico que cambia segun la hora del dia y el nombre */}
-      <p className="saludo-dinamico">{saludo}</p>
+      {/* RF-06: saludo dinamico con reloj en tiempo real */}
+      <p className="saludo-dinamico">{saludo} · {horaTexto}</p>
 
       {/* RF-02: banner visible cuando una llamada al backend falla.
           El usuario puede cerrarlo y seguir trabajando en modo Local. */}

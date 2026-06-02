@@ -4,13 +4,9 @@ Aplicación web para gestionar una colección de estampas del Mundial 2026. Perm
 
 | Servicio | URL |
 |----------|-----|
-| Frontend (Vercel) | [https://album-estampas.vercel.app/](https://album-estampas.vercel.app/) `[Biancka: pegar URL real]` |
-| Backend API | [https://album-estampas.vercel.app/api/](https://album-estampas.vercel.app/api/) `[Biancka: misma URL +/api porque el deploy es Vercel mono-proyecto]` |
-| Health check | [https://album-estampas.vercel.app/api/health](https://album-estampas.vercel.app/api/health) |
+| Frontend (Vercel) | [https://album-estampas.vercel.app/](https://album-estampas.vercel.app/) |
+| Backend (Render) | [https://sw-proyecto-final.onrender.com/api/health](https://sw-proyecto-final.onrender.com/api/health) |
 
-> Nota sobre el deploy: este proyecto consolida frontend y backend en un único proyecto de Vercel (el backend corre como serverless function bajo `/api/*`). La rúbrica original planteaba Render para el backend; se documenta esta decisión en [`DEPLOY.md`](./DEPLOY.md). 
-
----
 
 ## Screenshots
 
@@ -20,10 +16,6 @@ Aplicación web para gestionar una colección de estampas del Mundial 2026. Perm
 ### Modo oscuro
 ![Captura modo oscuro](./docs/img/captura_oscuro.png)
 
-### Gráficas visibles
-![Captura con gráficas](./docs/img/captura_graficas.png)
-
----
 
 ## Stack tecnológico
 
@@ -36,13 +28,13 @@ Aplicación web para gestionar una colección de estampas del Mundial 2026. Perm
 | Estado | useState / useContext / useReducer | (hooks nativos de React) |
 | Backend | Node.js + Express | Express 5.x |
 | Base de datos | PostgreSQL (Supabase, vía `pg`) | 15.x |
-| Deploy frontend y backend | Vercel | — |
+| Deploy frontend | Vercel | — |
+| Deploy backend | Render | — |
 
----
 
 ## Cómo correr el proyecto localmente
 
-Necesitás tener instalado **Node.js 18+** y dos terminales abiertas al mismo tiempo.
+Necesitás tener instalado Node.js 18+ y dos terminales abiertas al mismo tiempo.
 
 ### 1. Clonar el repositorio
 
@@ -51,26 +43,26 @@ git clone https://github.com/bianckaa/sw-proyecto-final
 cd sw-proyecto-final
 ```
 
-### 2. Configurar las variables de entorno del backend
-
-Antes de levantar el backend, copiar el archivo de ejemplo y pegar la cadena de conexión real de Supabase:
+### 2. Levantar el backend (Terminal 1)
 
 ```bash
 cd backend
 cp .env.example .env
-```
-
-Editar `backend/.env` y reemplazar `DATABASE_URL` con la cadena de conexión del **Session Pooler** de Supabase (formato `postgresql://postgres.<ref>:<password>@aws-0-<región>.pooler.supabase.com:5432/postgres`). Los pasos detallados están en [`DEPLOY.md`](./DEPLOY.md).
-
-### 3. Levantar el backend (terminal 1)
-
-```bash
-cd backend
+# Editar .env y reemplazar DATABASE_URL con la cadena de conexión de Supabase
 npm install
 node src/index.js
 ```
 
-El servidor queda corriendo en `http://localhost:3000`. Para verificar que la base de datos respondió bien, abrir `http://localhost:3000/api/health` en el navegador y confirmar que responde `{"estado":"ok","mensaje":"Backend y BD funcionando"}`.
+Verificar en: `http://localhost:3000/api/health`
+
+### 3. Levantar el frontend (Terminal 2)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
 
 ### 4. Levantar el frontend (terminal 2)
 
@@ -97,16 +89,9 @@ La app queda en `http://localhost:5173`.
 ---
 
 ## Mis primeros ítems (Fase 1)
+A continuación se muestran las primeras estampas reales registradas en la aplicación:
 
-Estas son las primeras estampas reales que registré en la aplicación durante la Fase 1, cuando el proyecto solo usaba `useState`, `useEffect` y `localStorage`:
-
-| # | Jugador | Selección | Categoría | Pegada | Repetidas |
-|---|---------|-----------|-----------|--------|-----------|
-| 1 | `[Biancka: nombre real]` | `[Biancka: selección]` | `[Biancka: categoría]` | `[Sí/No]` | `[Biancka: número]` |
-| 2 | `[Biancka: nombre real]` | `[Biancka: selección]` | `[Biancka: categoría]` | `[Sí/No]` | `[Biancka: número]` |
-| 3 | `[Biancka: nombre real]` | `[Biancka: selección]` | `[Biancka: categoría]` | `[Sí/No]` | `[Biancka: número]` |
-
-> `[Biancka: opcional]` agregar una captura `./docs/img/captura_items.png` con esos mismos ítems visibles en la app.
+![Estampas](./docs/img/captura_items.png)
 
 ---
 
@@ -147,14 +132,13 @@ el top 5 de selecciones nacionales con más estampas en mi colección. Agrupa lo
 items por `atributos.seleccion`, cuenta cuántos hay por selección, ordena
 descendente y se queda con las 5 primeras.
 
-**Por qué la elegí para el tema del álbum del Mundial 2026**: el álbum se completa
+*Por qué la elegí para el tema del álbum del Mundial 2026*: el álbum se completa
 por selecciones, no por categorías visuales. Saber qué selecciones tengo más
 avanzadas me dice cuáles puedo terminar pronto y, por contraste, qué
 selecciones casi no aparecen me indica dónde tengo que enfocarme para no quedarme
 atorada al final con países difíciles de conseguir.
 
-> 📸 Captura de la gráfica en funcionamiento:  
-> ![Gráfica puntuación por categoría](./docs/img/grafica_puntuacion_categoria.png)
+![Gráfica puntuación por categoría](./docs/img/grafica_puntuacion_categoria.png)
 
 ### Mis 3 decisiones técnicas
 
@@ -166,19 +150,17 @@ crear una acción por cada filtro, ya que esto evita repetir tres acciones casi 
 y mantiene el `switch` corto.
 
 #### (2) Acción más difícil
-`ELIMINAR` fue la más compleja porque la rúbrica pide *soft delete* (`activo=false`)
-y no remover del array. Si lo eliminaba físicamente, perdía datos al recargar y la
-gráfica de actividad no podía mostrar histórico. Lo resolví usando `.map()` para
+`ELIMINAR` fue la más difícil porque la rúbrica pide *soft delete* (`activo=false`)
+y no remover del array. Lo resolví usando `.map()` para
 clonar la lista y solo voltear `activo` del item afectado permitiendo restaurar items en el futuro.
 
 #### (3) Gráfica más compleja
-La `GraficaActividad` fue la más laborosa porque tiene que rellenar días vacíos
+La `GraficaActividad` fue la más compleja porque tiene que rellenar días vacíos
 con cero. Construyo primero un arreglo base de 7 días con `cantidad: 0` usando
 `new Date()` y `setDate(hoy - i)`, luego recorro `listaFiltrada` y sumo +1 al día
-que coincide con `fechaRegistro`. Esto garantiza que la barra de un día
-sin registros aparezca como hueco visible y no se "salte" del eje X.
+que coincide con `fechaRegistro`. Esto hace que la barra de un día
+sin registros aparezca como espacio visible y no se "salte" del eje X.
 
----
 
 ## Performance con React Profiler (Fase 3)
 
@@ -215,14 +197,18 @@ Los cuatro hooks personalizados viven en `frontend/src/hooks/` y reemplazan patr
 | `useAtajoTeclado` | `frontend/src/hooks/useAtajoTeclado.js` | Registra atajos de teclado declarativos (incluye soporte para `ctrl+<tecla>`) y limpia el listener automáticamente al desmontar. | `App.jsx` — registra `ctrl+n` (enfocar nombre) y `t` (alternar tema) |
 | `useProgreso` | `frontend/src/hooks/useProgreso.js` | Hook de dominio que calcula estadísticas del álbum a partir de la lista de ítems: total coleccionadas, porcentaje sobre el total oficial, agrupación por categoría, mejor calificación y racha actual de estampas completadas. | `App.jsx` — alimenta el indicador `"Colección: X estampas · Y% del álbum · racha de Z completadas"` |
 
----
 
 ## Sobre mí
 
 **Nombre:** Biancka Mery Alessandra Raxón Ajcuc
 **Carnet:** 24960
-**Semestre:** Quinto semestre 
+**Semestre:** Quinto semestre
 
 ### Reflexión
 
 El curso me permitió comprender cómo se relacionan el frontend y el backend dentro de una aplicación web completa. React fue la parte que más se me complicó, especialmente al trabajar con el manejo de estado mediante `useReducer`. Finalizando este proyecto, entendí la importancia de mantener una estructura organizada y escalable para desarrollar aplicaciones complejas.
+
+
+## Video de demostración
+
+[Ver video](https:/)
