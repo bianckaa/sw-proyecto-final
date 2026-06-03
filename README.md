@@ -2,10 +2,11 @@
 
 Aplicación web para gestionar una colección de estampas del Mundial 2026. Permite registrar, editar y archivar estampas con información como el jugador, selección, categoría, si ya está pegada en el álbum o si se tiene repetida.
 
-| Servicio | URL |
-|----------|-----|
-| Frontend (Vercel) | [https://album-estampas.vercel.app/](https://album-estampas.vercel.app/) |
-| Backend (Render) | [https://sw-proyecto-final.onrender.com/api/health](https://sw-proyecto-final.onrender.com/api/health) |
+| Servicio | Plataforma | URL / Referencia |
+|----------|------------|-----------------|
+| Frontend | Vercel | [https://album-estampas.vercel.app/](https://album-estampas.vercel.app/) |
+| Backend API | Render | [https://sw-proyecto-final.onrender.com](https://sw-proyecto-final.onrender.com) |
+| Base de datos | Supabase | Proyecto `ebutwsctfawwhesbwkdk`, conexión configurada en Render vía `DATABASE_URL` |
 
 
 ## Screenshots
@@ -56,15 +57,6 @@ node src/index.js
 Verificar en: `http://localhost:3000/api/health`
 
 ### 3. Levantar el frontend (Terminal 2)
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-
-### 4. Levantar el frontend (terminal 2)
 
 ```bash
 cd frontend
@@ -211,4 +203,4 @@ El curso me permitió comprender cómo se relacionan el frontend y el backend de
 
 ## Video de demostración
 
-[Ver video](https:/)
+[Ver video](https://youtu.be/Zb7e4DGyd5I)

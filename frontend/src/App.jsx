@@ -52,9 +52,20 @@ function Contenido() {
     ? `${saludoBase}, ${nombreUsuario}`
     : `${saludoBase}, bienvenida a tu álbum`
 
+  // Contador que solo sube cuando se agrega un item NUEVO desde el formulario.
+  // Coleccion lo usa como señal para hacer scroll al final.
+  const [nuevoItemKey, setNuevoItemKey] = useState(0)
+
   const recargar = useCallback(async () => {
     const data = await obtenerItems()
     dispatch({ type: 'HIDRATAR', payload: data })
+  }, [obtenerItems])
+
+  // Igual que recargar pero ademas señala que hay un item nuevo al final
+  const recargarNuevoItem = useCallback(async () => {
+    const data = await obtenerItems()
+    dispatch({ type: 'HIDRATAR', payload: data })
+    setNuevoItemKey((k) => k + 1)
   }, [obtenerItems])
 
   useEffect(() => {
@@ -217,7 +228,7 @@ function Contenido() {
 
       <EstadisticasResumen estadisticas={estadisticas} />
 
-      <Formulario ref={nombreRef} onGuardado={recargar} />
+      <Formulario ref={nombreRef} onGuardado={recargarNuevoItem} />
 
       <BarraFiltros
         filtroCategoria={filtroCategoria}
@@ -230,6 +241,8 @@ function Contenido() {
         items={listaFiltrada}
         onCambio={recargar}
         onEliminar={handleEliminar}
+        dispatch={dispatch}
+        nuevoItemKey={nuevoItemKey}
       />
 
       <PanelGraficas

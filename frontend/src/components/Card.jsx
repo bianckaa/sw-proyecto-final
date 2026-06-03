@@ -2,7 +2,7 @@ import { memo, useState, forwardRef } from 'react'
 import { useStorage } from '../context/StorageProvider'
 import { CATEGORIAS } from '../utils/categorias'
 
-const Card = forwardRef(function Card({ item, onCambio, onEliminar }, ref) {
+const Card = forwardRef(function Card({ item, onCambio, onEliminar, dispatch }, ref) {
     const { guardarItem, eliminarItem, registrarActividad, obtenerRegistros } = useStorage()
     const categoria = CATEGORIAS.find((cat) => cat.id === item.categoriaId)
     const colorCategoria = categoria?.color || 'var(--color-text-muted)'
@@ -103,6 +103,12 @@ const Card = forwardRef(function Card({ item, onCambio, onEliminar }, ref) {
             })
         }
 
+        // Actualiza el item en el reducer SIN recargar toda la lista.
+        // Asi la card no cambia de posicion al guardar.
+        if (dispatch) {
+            dispatch({ type: 'ACTUALIZAR', payload: itemActualizado })
+        }
+
         // Si el panel de historial estaba abierto, lo refrescamos para que
         // el nuevo registro aparezca al instante
         if (mostrarHistorial) {
@@ -111,7 +117,6 @@ const Card = forwardRef(function Card({ item, onCambio, onEliminar }, ref) {
         }
 
         setEditando(false)
-        if (onCambio) onCambio()
     }
 
     // RF-03: alterna la visibilidad del historial. La primera vez que se abre

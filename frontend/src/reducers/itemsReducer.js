@@ -10,6 +10,14 @@ export function itemsReducer(state, action) {
     case 'HIDRATAR':
       return { ...state, lista: action.payload }
 
+    case 'ACTUALIZAR':
+      return {
+        ...state,
+        lista: state.lista.map((item) =>
+          item.id === action.payload.id ? { ...item, ...action.payload } : item
+        ),
+      }
+
     case 'AGREGAR':
       return { ...state, lista: [...state.lista, action.payload] }
 
