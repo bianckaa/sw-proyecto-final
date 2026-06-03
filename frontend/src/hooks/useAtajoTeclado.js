@@ -19,9 +19,18 @@ export function useAtajoTeclado(atajos, activo = true) {
     const manejarTecla = (evento) => {
       if (!activo) return
 
+      const conModificador = evento.ctrlKey || evento.metaKey
+
+      // Atajos de tecla sola (sin Ctrl/Cmd) no se activan si el usuario
+      // está escribiendo en un input, textarea o select, para no interferir
+      // con la escritura normal
+      if (!conModificador) {
+        const tag = evento.target.tagName
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+      }
+
       // Construye la clave que debe coincidir con el objeto de atajos.
       // Si hay Ctrl (o Cmd en macOS), antepone "ctrl+" a la tecla pulsada.
-      const conModificador = evento.ctrlKey || evento.metaKey
       const claveBuscada = conModificador
         ? `ctrl+${evento.key.toLowerCase()}`
         : evento.key

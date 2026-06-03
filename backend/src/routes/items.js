@@ -15,7 +15,7 @@ const formatearItem = (fila) => ({
 router.get('/', async (req, res) => {
   try {
     const resultado = await pool.query(
-      'SELECT * FROM items WHERE activo = $1',
+      'SELECT * FROM items WHERE activo = $1 ORDER BY "fechaRegistro" ASC',
       [1]
     )
     res.json(resultado.rows.map(formatearItem))
