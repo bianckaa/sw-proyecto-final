@@ -12,8 +12,6 @@
   --color-success-soft: #E3F5E9;
   --color-border:      #C0BFBF;
 
-<<<<<<< HEAD
-=======
   /* Colores del banner de error y de las graficas, definidos como variables
      para que respondan al cambio de tema sin valores hex en JSX o CSS */
   --color-error-bg:     #FDECEA;
@@ -22,7 +20,6 @@
   --color-grafica-1:    #1B4FBB;
   --color-grafica-2:    #E8192C;
 
->>>>>>> main
   --text: #6b6375;
   --text-h: #08060d;
   --bg: #fff;
@@ -67,8 +64,6 @@ body[data-theme='oscuro'] {
   --color-on-warn:   #0D0D0D;
   --color-success-soft: #14331F;
   --color-border:      #3A3A3A;
-<<<<<<< HEAD
-=======
 
   /* Variantes para tema oscuro: mas contraste sobre fondos negros */
   --color-error-bg:     #4A1A1A;
@@ -76,7 +71,6 @@ body[data-theme='oscuro'] {
   --color-error-border: #8C2F2F;
   --color-grafica-1:    #5A80E0;
   --color-grafica-2:    #FF4D5E;
->>>>>>> main
 }
 
 @media (prefers-color-scheme: dark) {

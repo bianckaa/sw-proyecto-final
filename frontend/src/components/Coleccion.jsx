@@ -1,16 +1,6 @@
 import { useRef, useEffect } from 'react'
 import Card from './Card'
 
-<<<<<<< HEAD
-function Coleccion({ items, onCambio, onEliminar, onCambiarEstado }) {
-    const itemsActivos = items.filter((item) => item.activo === true)
-
-    const lastItemRef = useRef(null)
-
-    useEffect(() => {
-        lastItemRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [items])
-=======
 function Coleccion({ items, onCambio, onEliminar, dispatch, nuevoItemKey }) {
     const itemsActivos = items.filter((item) => item.activo === true)
     const lastItemRef = useRef(null)
@@ -22,7 +12,6 @@ function Coleccion({ items, onCambio, onEliminar, dispatch, nuevoItemKey }) {
             lastItemRef.current?.scrollIntoView({ behavior: 'smooth' })
         }
     }, [nuevoItemKey])
->>>>>>> main
 
     return (
     <div className="coleccion">
@@ -32,11 +21,7 @@ function Coleccion({ items, onCambio, onEliminar, dispatch, nuevoItemKey }) {
             item={item}
             onCambio={onCambio}
             onEliminar={onEliminar}
-<<<<<<< HEAD
-            onCambiarEstado={onCambiarEstado}
-=======
             dispatch={dispatch}
->>>>>>> main
             ref={index === itemsActivos.length - 1 ? lastItemRef : null}
         />
         ))}

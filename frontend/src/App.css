@@ -333,12 +333,8 @@ h2 {
 .btn-editar:hover { background: var(--color-primary); color: var(--color-on-color); }
 
 
-<<<<<<< HEAD
-.panel-graficas { margin-top: 2rem; }
-=======
 .panel-graficas { margin: 2rem 1.5rem 0; }
 @media (max-width: 768px) { .panel-graficas { margin: 2rem 1rem 0; } }
->>>>>>> main
 .panel-graficas h2 { text-align: center; margin-bottom: 1rem; }
 .grid-graficas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
 .grid-graficas .grafica { background: var(--color-surface, #fff); padding: 1rem; border-radius: 8px; border: 1px solid rgba(0,0,0,0.1); }
@@ -346,15 +342,6 @@ h2 {
 @media (max-width: 768px) { .grid-graficas { grid-template-columns: 1fr; } }
 
 
-<<<<<<< HEAD
-.estadisticas-resumen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 1.5rem 0; }
-.tarjeta-estadistica { background: var(--color-surface, #fff); border: 1px solid rgba(0,0,0,0.08); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
-.tarjeta-valor { font-size: 2rem; font-weight: 700; font-family: 'FWC2026', 'Noto Sans', sans-serif; }
-.tarjeta-etiqueta { font-size: 0.85rem; color: var(--color-text-muted, #555); text-align: center; }
-@media (max-width: 768px) { .estadisticas-resumen { grid-template-columns: repeat(2, 1fr); } }
-
-.indicador-progreso { text-align: center; font-size: 0.95rem; color: var(--color-text-muted, #555); margin: 0.5rem 0 1.5rem; }
-=======
 .estadisticas-resumen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 1.5rem 1.5rem; }
 .tarjeta-estadistica { background: var(--color-surface, #fff); border: 1px solid rgba(0,0,0,0.08); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
 .tarjeta-valor { font-size: 2rem; font-weight: 700; font-family: 'FWC2026', 'Noto Sans', sans-serif; }
@@ -518,4 +505,3 @@ h2 {
   font-size: 0.85rem;
 }
 .btn-actividad:hover { opacity: 0.9; }
->>>>>>> main

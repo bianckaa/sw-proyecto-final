@@ -2,13 +2,8 @@ import { memo, useState, forwardRef } from 'react'
 import { useStorage } from '../context/StorageProvider'
 import { CATEGORIAS } from '../utils/categorias'
 
-<<<<<<< HEAD
-const Card = forwardRef(function Card({ item, onCambio, onEliminar, onCambiarEstado }, ref) {
-    const { guardarItem, eliminarItem } = useStorage()
-=======
 const Card = forwardRef(function Card({ item, onCambio, onEliminar, dispatch }, ref) {
     const { guardarItem, eliminarItem, registrarActividad, obtenerRegistros } = useStorage()
->>>>>>> main
     const categoria = CATEGORIAS.find((cat) => cat.id === item.categoriaId)
     const colorCategoria = categoria?.color || 'var(--color-text-muted)'
     const fondoCategoria = categoria ? `${categoria.color}1A` : 'var(--color-surface)'
@@ -28,8 +23,6 @@ const Card = forwardRef(function Card({ item, onCambio, onEliminar, dispatch }, 
         }
     })
 
-<<<<<<< HEAD
-=======
     // Estado para mostrar/ocultar el historial de actividad y los registros traidos
     const [mostrarHistorial, setMostrarHistorial] = useState(false)
     const [registros, setRegistros] = useState([])
@@ -45,7 +38,6 @@ const Card = forwardRef(function Card({ item, onCambio, onEliminar, dispatch }, 
         })
     }
 
->>>>>>> main
     const handleClickEliminar = async () => {
         if (onEliminar) {
             await onEliminar(item.id)
@@ -55,10 +47,6 @@ const Card = forwardRef(function Card({ item, onCambio, onEliminar, dispatch }, 
         }
     }
 
-<<<<<<< HEAD
-    const handleClickEstado = () => {
-        if (onCambiarEstado) onCambiarEstado(item.id)
-=======
     // Helper: arma una lista descriptiva de los campos que cambiaron entre
     // el item original y los valores del formulario. Convierte el id de
     // categoria al nombre legible y los booleanos a si/no.
@@ -141,7 +129,6 @@ const Card = forwardRef(function Card({ item, onCambio, onEliminar, dispatch }, 
             setCargandoRegistros(false)
         }
         setMostrarHistorial(!mostrarHistorial)
->>>>>>> main
     }
 
     return (
@@ -156,33 +143,6 @@ const Card = forwardRef(function Card({ item, onCambio, onEliminar, dispatch }, 
             {editando ? (
                 <>
                     <input
-<<<<<<< HEAD
-                        value={formEdicion.atributos.numeroEstampa}
-                        onChange={(e) => setFormEdicion({...formEdicion.atributos, numeroEstampa: e.target.value})}
-                    />
-                    <input
-                        value={formEdicion.atributos.jugador}
-                        onChange={(e) => setFormEdicion({...formEdicion.atributos, jugador: e.target.value})}
-                    />
-                    <input
-                        value={formEdicion.atributos.seleccion}
-                        onChange={(e) => setFormEdicion({
-                        ...formEdicion,
-                        atributos: {...formEdicion.atributos, seleccion: e.target.value}
-                        })}
-                    />
-                    <input
-                        value={formEdicion.atributos.repetidas}
-                        onChange={(e) => setFormEdicion({...formEdicion.atributos, repetidas: e.target.value})}
-                    />
-                    <input
-                        value={formEdicion.categoriaId}
-                        onChange={(e) => setFormEdicion({...formEdicion, categoriaId: e.target.value})}
-                    />
-                    <input
-                        value={formEdicion.puntuacion}
-                        onChange={(e) => setFormEdicion({...formEdicion, puntuacion: e.target.value})}
-=======
                         value={formEdicion.nombre}
                         onChange={(e) => setFormEdicion({...formEdicion, nombre: e.target.value})}
                         placeholder="Nombre"
@@ -236,25 +196,14 @@ const Card = forwardRef(function Card({ item, onCambio, onEliminar, dispatch }, 
                         value={formEdicion.puntuacion}
                         onChange={(e) => setFormEdicion({...formEdicion, puntuacion: e.target.value})}
                         placeholder="Puntuación (0-10)"
->>>>>>> main
                     />
                     <input
                         value={formEdicion.notas}
                         onChange={(e) => setFormEdicion({...formEdicion, notas: e.target.value})}
-<<<<<<< HEAD
-                    />
-
-                    <button onClick={async () => {
-                        await guardarItem({ ...item, ...formEdicion })
-                        setEditando(false)
-                        if (onCambio) onCambio()
-                    }}>Guardar</button>
-=======
                         placeholder="Notas"
                     />
 
                     <button onClick={handleGuardarEdicion}>Guardar</button>
->>>>>>> main
                     <button onClick={() => setEditando(false)}>Cancelar</button>
                 </>
             ) : (
@@ -277,13 +226,6 @@ const Card = forwardRef(function Card({ item, onCambio, onEliminar, dispatch }, 
                     <p>Puntuación: {item.puntuacion}/10</p>
                     <p>Notas: {item.notas}</p>
 
-<<<<<<< HEAD
-                    <button className="btn-estado" onClick={handleClickEstado}>
-                        {item.estado === 'completado' ? 'Marcar pendiente' : 'Marcar completado'}
-                    </button>
-                    <button className="btn-eliminar" onClick={handleClickEliminar}>Eliminar</button>
-                    <button className="btn-editar" onClick={() => setEditando(true)}>Editar</button>
-=======
                     <button className="btn-eliminar" onClick={handleClickEliminar}>Eliminar</button>
                     <button className="btn-editar" onClick={() => setEditando(true)}>Editar</button>
                     <button className="btn-historial" onClick={handleToggleHistorial}>
@@ -311,15 +253,10 @@ const Card = forwardRef(function Card({ item, onCambio, onEliminar, dispatch }, 
                             )}
                         </div>
                     )}
->>>>>>> main
                 </>
             )}
         </div>
     )
 })
 
-<<<<<<< HEAD
 export default memo(Card)
-=======
-export default memo(Card)
->>>>>>> main

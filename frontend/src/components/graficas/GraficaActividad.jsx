@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-=======
 import { useEffect, useState } from 'react'
->>>>>>> main
 import {
   BarChart,
   Bar,
@@ -12,10 +9,6 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from 'recharts'
-<<<<<<< HEAD
-
-function GraficaActividad({ datos }) {
-=======
 import { useTheme } from '../../context/ThemeProvider'
 
 function GraficaActividad({ datos }) {
@@ -31,7 +24,6 @@ function GraficaActividad({ datos }) {
     if (valor) setColor(valor)
   }, [tema])
 
->>>>>>> main
   return (
     <div className="grafica">
       <h3>Actividad últimos 7 días</h3>
@@ -42,11 +34,7 @@ function GraficaActividad({ datos }) {
           <YAxis allowDecimals={false} />
           <Tooltip />
           <Legend />
-<<<<<<< HEAD
-          <Bar dataKey="cantidad" name="Estampas registradas" fill="#1B4FBB" />
-=======
           <Bar dataKey="cantidad" name="Estampas registradas" fill={color} />
->>>>>>> main
         </BarChart>
       </ResponsiveContainer>
     </div>
