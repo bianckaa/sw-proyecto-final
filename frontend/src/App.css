@@ -346,3 +346,5 @@ h2 {
 .tarjeta-valor { font-size: 2rem; font-weight: 700; font-family: 'FWC2026', 'Noto Sans', sans-serif; }
 .tarjeta-etiqueta { font-size: 0.85rem; color: var(--color-text-muted, #555); text-align: center; }
 @media (max-width: 768px) { .estadisticas-resumen { grid-template-columns: repeat(2, 1fr); } }
+
+.indicador-progreso { text-align: center; font-size: 0.95rem; color: var(--color-text-muted, #555); margin: 0.5rem 0 1.5rem; }

@@ -10,6 +10,8 @@ import { StorageProvider, useStorage } from './context/StorageProvider'
 import { ThemeProvider, useTheme } from './context/ThemeProvider'
 import { itemsReducer, initialState } from './reducers/itemsReducer'
 import { CATEGORIAS } from './utils/categorias'
+import { useAtajoTeclado } from './hooks/useAtajoTeclado'
+import { useProgreso } from './hooks/useProgreso'
 
 function Contenido() {
   const { modo, setModo, obtenerItems, eliminarItem } = useStorage()
@@ -28,19 +30,16 @@ function Contenido() {
     recargar()
   }, [modo])
 
-  useEffect(() => {
-    const handler = (e) => {
-      if (e.ctrlKey && e.key === 'n') {
-        e.preventDefault()
-        nombreRef.current?.focus()
-      }
-      if (e.key === 't' && !e.ctrlKey && !e.altKey) {
-        toggleTema()
-      }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [toggleTema])
+  // Atajos de teclado declarativos: la tecla "n" enfoca el formulario,
+  // la tecla "t" alterna entre tema claro y oscuro
+  const atajos = useMemo(
+    () => ({
+      n: () => nombreRef.current?.focus(),
+      t: toggleTema,
+    }),
+    [toggleTema]
+  )
+  useAtajoTeclado(atajos)
 
   const listaFiltrada = useMemo(() => {
     return state.lista.filter((item) => {
@@ -126,6 +125,13 @@ function Contenido() {
     dispatch({ type: 'CAMBIAR_ESTADO', payload: id })
   }, [])
 
+  // Items activos (no archivados) usados por el hook de progreso del album
+  const itemsActivos = useMemo(
+    () => state.lista.filter((item) => item.activo),
+    [state.lista]
+  )
+  const progreso = useProgreso(itemsActivos)
+
   return (
     <div>
       <div className="controles-superiores">
@@ -152,6 +158,11 @@ function Contenido() {
       </div>
 
       <h1>Albúm Copa Mundial de Fútbol 2026</h1>
+
+      <p className="indicador-progreso">
+        Colección: {progreso.totalColectadas} estampas · {progreso.porcentaje}% del álbum
+        {progreso.rachaActual > 0 && ` · racha de ${progreso.rachaActual} completadas`}
+      </p>
 
       <Formulario ref={nombreRef} onGuardado={recargar} />
 

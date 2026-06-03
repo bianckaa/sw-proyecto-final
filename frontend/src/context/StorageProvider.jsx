@@ -2,7 +2,10 @@ import { createContext, useContext, useState } from 'react'
 
 const StorageContext = createContext(null)
 
-const API_URL = 'http://localhost:3000/api/items'
+// import.meta.env es la forma de Vite de leer variables de entorno del .env.local
+// Las variables DEBEN empezar con VITE_ para que Vite las incluya en el build
+const URL_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+const API_URL = `${URL_BASE}/api/items`
 const CLAVE_LOCAL = 'items'
 
 export function StorageProvider({ children }) {
